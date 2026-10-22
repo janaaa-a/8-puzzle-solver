@@ -16,7 +16,7 @@ from bfs import solve_bfs
 from astar import solve_astar
 from dfs import solve_dfs
 from iddfs import solve_iddfs
-STEP_DELAY = 600                 # milliseconds between steps while playing
+STEP_DELAY = 500                 # milliseconds between steps while playing
 
 
 class PuzzleApp:
