@@ -1,4 +1,4 @@
-import math
+import math, time
 import random
 """
 puzzle.py - shared helpers for the 8-puzzle solver.
@@ -179,3 +179,31 @@ def print_solution(result):
     print(f"Running time   : {result['time']} s")
 
 
+def build_result(path, moves, nodes_expanded, search_depth, start_time):
+    """Packs the metrics into the dict format shared by all algorithms."""
+    return {
+        "path": path,                       # list of states, start -> goal
+        "moves": moves,                     # list of 'Up'/'Down'/'Left'/'Right'
+        "cost": len(moves) if path else -1, # -1 means "no solution"
+        "nodes_expanded": nodes_expanded,
+        "search_depth": search_depth,       # deepest level reached by the search
+        "time": round(time.perf_counter() - start_time, 4),
+    }
+
+
+def reconstruct_path(parents, goal_state):
+    """
+    Walks backwards from the goal to the start using the parent map,
+    then reverses the result so it reads start -> goal.
+    """
+    path, moves = [], []
+    state = goal_state
+    while parents[state] is not None:       # the start state has parent None
+        prev_state, move = parents[state]
+        path.append(state)
+        moves.append(move)
+        state = prev_state
+    path.append(state)                      # add the start state itself
+    path.reverse()
+    moves.reverse()
+    return path, moves

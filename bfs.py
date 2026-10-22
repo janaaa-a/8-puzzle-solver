@@ -1,37 +1,6 @@
 from collections import deque
 import time
-from puzzle import get_neighbors, is_goal, is_solvable
-
-
-def _build_result(path, moves, nodes_expanded, search_depth, start_time):
-    """Packs the metrics into the dict format shared by all algorithms."""
-    return {
-        "path": path,                       # list of states, start -> goal
-        "moves": moves,                     # list of 'Up'/'Down'/'Left'/'Right'
-        "cost": len(moves) if path else -1, # -1 means "no solution"
-        "nodes_expanded": nodes_expanded,
-        "search_depth": search_depth,       # deepest level reached by the search
-        "time": round(time.perf_counter() - start_time, 4),
-    }
-
-
-def _reconstruct_path(parents, goal_state):
-    """
-    Walks backwards from the goal to the start using the parent map,
-    then reverses the result so it reads start -> goal.
-    """
-    path, moves = [], []
-    state = goal_state
-    while parents[state] is not None:       # the start state has parent None
-        prev_state, move = parents[state]
-        path.append(state)
-        moves.append(move)
-        state = prev_state
-    path.append(state)                      # add the start state itself
-    path.reverse()
-    moves.reverse()
-    return path, moves
-
+from puzzle import get_neighbors, is_goal, is_solvable, reconstruct_path, build_result
 
 def solve_bfs(start_state):
     """
@@ -78,8 +47,8 @@ def solve_bfs(start_state):
 
             # Goal test at generation time (the assumption to state in the report).
             if is_goal(neighbor):
-                path, moves = _reconstruct_path(parents, neighbor)
-                return _build_result(path, moves, nodes_expanded,
+                path, moves = reconstruct_path(parents, neighbor)
+                return build_result(path, moves, nodes_expanded,
                                      max_search_depth, start_time)
 
             queue.append((neighbor, depth + 1))
