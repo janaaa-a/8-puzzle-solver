@@ -17,11 +17,11 @@ def solve_bfs(start_state):
 
     # Unsolvable boards: return immediately instead of searching everything.
     if not is_solvable(start_state):
-        return _build_result([], [], 0, 0, start_time)
+        return build_result([], [], 0, 0, start_time)
 
     # The start state might already be the goal.
     if is_goal(start_state):
-        return _build_result([start_state], [], 0, 0, start_time)
+        return build_result([start_state], [], 0, 0, start_time)
 
     # Queue holds a tuple:(state, depth).
     queue = deque([(start_state, 0)])
