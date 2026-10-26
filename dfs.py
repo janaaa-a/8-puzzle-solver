@@ -31,20 +31,20 @@ def solve_dfs(start_state):
     # Unsolvable boards: return immediately, otherwise DFS would search
     # every reachable state before giving up.
     if not is_solvable(start_state):
-        return build_result([], [], 0, 0, start_time)
+        return build_result([], [], -1, 0, start_time)
 
     # The start state might already be the goal.
     if is_goal(start_state):
         return build_result([start_state], [], 0, 0, start_time)
 
     # Stack items: (state, depth, parent state, move that led here).
-    stack = [(start_state, 0, None, None)]
+    frontier = [(start_state, 0, None, None)]
     parents = {}              # state -> (parent_state, move); keys = visited states
     nodes_expanded = 0
     max_depth = 0
 
-    while stack:
-        state, depth, parent, move = stack.pop()
+    while frontier:
+        state, depth, parent, move = frontier.pop()
 
         # The same state can be pushed several times before it is popped.
         # Only the first copy popped is visited; later copies are discarded.
@@ -71,7 +71,7 @@ def solve_dfs(start_state):
                 path, moves = reconstruct_path(parents, neighbor)
                 return build_result(path, moves, nodes_expanded, max_depth, start_time)
 
-            stack.append((neighbor, depth + 1, state, move_name))
+            frontier.append((neighbor, depth + 1, state, move_name))
 
     # Only reached if no solution exists (should not happen for solvable boards).
     return build_result([], [], nodes_expanded, max_depth, start_time)

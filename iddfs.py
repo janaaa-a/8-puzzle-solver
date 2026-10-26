@@ -30,7 +30,7 @@ def solve_iddfs(start_state):
 
     # Unsolvable boards: skip all 31 rounds of useless searching.
     if not is_solvable(start_state):
-        return build_result([], [], 0, 0, start_time)
+        return build_result([], [], -1, 0, start_time)
 
     # The start state might already be the goal.
     if is_goal(start_state):
@@ -42,12 +42,12 @@ def solve_iddfs(start_state):
 
     for limit in range(1, 32):
         # Fresh data for every round.
-        stack = [(start_state, 0, None, None)]   # (state, depth, parent, move)
+        frontier = [(start_state, 0, None, None)]   # (state, depth, parent, move)
         parents = {}        # state -> (parent_state, move) for path rebuilding
         best_depth = {}     # state -> shallowest depth it was reached at this round
 
-        while stack:
-            state, depth, parent, move = stack.pop()
+        while frontier:
+            state, depth, parent, move = frontier.pop()
 
             # Skip this visit unless it reaches the state at a SHALLOWER depth.
             # A plain visited set would be wrong here: if a state is first
@@ -81,7 +81,7 @@ def solve_iddfs(start_state):
                     path, moves = reconstruct_path(parents, neighbor)
                     return build_result(path, moves, nodes_expanded, max_depth, start_time)
 
-                stack.append((neighbor, depth + 1, state, move_name))
+                frontier.append((neighbor, depth + 1, state, move_name))
 
     # Only reached if no solution exists within 31 moves.
     return build_result([], [], nodes_expanded, max_depth, start_time)

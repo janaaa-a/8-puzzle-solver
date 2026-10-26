@@ -1,25 +1,17 @@
 import math, time
 import random
 """
-puzzle.py - shared helpers for the 8-puzzle solver.
+puzzle.py - shared helpers.
 
-Every algorithm (BFS, DFS, IDDFS, A*) and the GUI import from this file.
 STATE REPRESENTATION
-    A state is a tuple of 9 integers. 0 is the blank.
-    Index layout:        Example (1,2,5,3,4,0,6,7,8):
-        0 1 2                1 2 5
-        3 4 5                3 4 _
-        6 7 8                6 7 8
+    A state is a tuple of 9 integers.
     Tuples are used (not lists) because they are immutable and can be used as dictionary keys.
 """
 
-
-# Goal state
 GOAL = (0, 1, 2, 3, 4, 5, 6, 7, 8)
 
-# Each move describes where the BLANK moves.
-# (row change, column change). The order here is the order neighbors are generated in, which matters for tie breaking in DFS. 
-# generated in, which matters for tie-breaking in DFS. 
+
+# (row change, column change). The order here is the order neighbors are generated in, which matters for tie breaking.  
 MOVES = (
     ("Up", -1, 0),
     ("Down", 1, 0),
@@ -27,20 +19,17 @@ MOVES = (
     ("Right", 0, 1),
 )
 def is_goal(state):
-    #returns true if the state equals the goal state
     return state == GOAL
 
 
 def get_neighbors(state):
     """
-    Generates every state reachable with one legal move.
-
     Returns:
         list of (move_name, new_state) tuples, in the order Up, Down, Left, Right.
     """
     neighbors = []
     blank = state.index(0)             # position of the blank in the flat tuple
-    row, col = divmod(blank, 3)        # convert the index to (row = blank//3, column = blank % 3) in a 3x3 board 
+    row, col = divmod(blank, 3)        # convert the index to (row = tile//3, tile = blank % 3) in a 3x3 board 
 
     for name, d_row, d_col in MOVES:
         new_row, new_col = row + d_row, col + d_col
@@ -61,8 +50,6 @@ def get_neighbors(state):
 
 def is_solvable(state):
     """
-    Checks whether the goal can be reached from this state.
-
     An inversion is a pair of tiles (ignoring the blank) where a bigger
     number appears before a smaller one. On a 3x3 board a state is solvable
     exactly when its number of inversions is even. Half of all random
@@ -129,7 +116,7 @@ def random_state():
 def parse_state(text):
     """
     Converts a string like '1,2,5,3,4,0,6,7,8' 
-    into a state tuple. Raises ValueError if it isn't a valid board.
+    into a state tuple. also checks if its a valid board.
     """
     state = tuple(int(x) for x in text.replace(" ", "").split(","))
     if sorted(state) != list(range(9)):
@@ -138,7 +125,7 @@ def parse_state(text):
 
 
 def board_to_string(state):
-    #Returns the board as 3 lines of text, with the blank shown as '_'
+    #Returns the board as 3*3 grid instead of a single line, with the blank shown as '_'
     lines = []
     for r in range(3):                      # go through each row
         row = ""
@@ -148,17 +135,16 @@ def board_to_string(state):
                 row += "_ "
             else:
                 row += str(tile) + " "
-        lines.append(row.rstrip())          # remove the extra space at the end
+        lines.append(row)         
     return "\n".join(lines)                 # glue the 3 rows together with newlines
 
 def print_board(state):
-    #Prints the board in the terminal 
     print(board_to_string(state))
 
 
 def print_solution(result):
     """
-    Prints a full trace of a result dict (thereturn format):
+    Prints a full trace of a result dict
     every step's move and board, then the statistics.
     """
     if result["cost"] == -1:
@@ -183,8 +169,8 @@ def build_result(path, moves, nodes_expanded, search_depth, start_time):
     """Packs the metrics into the dict format shared by all algorithms."""
     return {
         "path": path,                       # list of states, start -> goal
-        "moves": moves,                     # list of 'Up'/'Down'/'Left'/'Right'
-        "cost": len(moves) if path else -1, # -1 means "no solution"
+        "moves": moves,                   
+        "cost": len(moves) if path else -1, 
         "nodes_expanded": nodes_expanded,
         "search_depth": search_depth,       # deepest level reached by the search
         "time": round(time.perf_counter() - start_time, 4),

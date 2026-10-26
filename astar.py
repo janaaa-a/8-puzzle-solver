@@ -1,7 +1,7 @@
 #astar.py - A* search for the 8-puzzle.
 import heapq
 import time
-from puzzle import is_goal, get_neighbors, is_solvable, manhattan, euclidean , reconstruct_path, build_result
+from puzzle import is_goal, get_neighbors, is_solvable, manhattan , reconstruct_path, build_result
  
  
 def solve_astar(start_state, heuristic=manhattan):
@@ -20,24 +20,22 @@ def solve_astar(start_state, heuristic=manhattan):
  
     # Unsolvable boards: return immediately instead of searching everything.
     if not is_solvable(start_state):
-        return build_result([], [], 0, 0, start_time)
+        return build_result([], [], -1, 0, start_time)
  
-    # The start state might already be the goal.
     if is_goal(start_state):
         return build_result([start_state], [], 0, 0, start_time)
  
-    # Frontier = priority queue (min-heap) of (f, h, counter, state).
-    #  - f decides which state is expanded next.
-    #  - h breaks ties in favour of states that look closer to the goal.
+    # Frontier = priority queue of (f, h, counter, state).
+    #  - f distance from start+heuristic.
+    #  - h heuristic value.
     #  - counter breaks any remaining ties (first generated, first expanded),
-    #    so Python never has to compare two states.
     counter = 0
     start_h = heuristic(start_state)
     frontier = [(start_h, start_h, counter, start_state)]
  
     best_g = {start_state: 0}          # cheapest known cost to reach each state
     parents = {start_state: None}      # state -> (parent_state, move) for the path
-    closed = set()                     # states that were already expanded
+    visited = set()                  
  
     nodes_expanded = 0
     max_search_depth = 0
@@ -46,23 +44,23 @@ def solve_astar(start_state, heuristic=manhattan):
         _, _, _, state = heapq.heappop(frontier)
  
         # A state can be pushed more than once (when a cheaper route to it is
-        # found). Skip the stale copies of states we already expanded.
-        if state in closed:
+        # found). Skip the copies of states we already expanded.
+        if state in visited:
             continue
  
-        # Goal test when the state is POPPED (not when generated).
-        # This is what guarantees A* returns an optimal path.
+        # Goal test when the state is POPPED .
+        # This is what guarantees A* returns an optimal path(this is in case if moves had different costs but here it doesnt matter).
         if is_goal(state):
             path, moves = reconstruct_path(parents, state)
             return build_result(path, moves, nodes_expanded,
                                  max_search_depth, start_time)
  
-        closed.add(state)
-        nodes_expanded += 1            # expanded = we generate its children now
+        visited.add(state)
+        nodes_expanded += 1     
         g = best_g[state]
  
         for move, neighbor in get_neighbors(state):
-            if neighbor in closed:     # consistent heuristic: never needs reopening
+            if neighbor in visited: 
                 continue
  
             new_g = g + 1              # every move costs 1

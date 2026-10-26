@@ -1,12 +1,10 @@
 """
-gui_tk.py - Tkinter visualizer for the 8-puzzle solvers.
+- Tkinter visualizer for the 8-puzzle solvers.
 
 HOW TKINTER WORKS
     1. Create widgets (Label, Button, Frame) and place them in a window.
     2. Give each button a `command`: the function to call when it is clicked.
     3. root.mainloop() waits for clicks forever and calls those functions.
-    The solvers (bfs.py, astar.py, ...) know nothing about the GUI. They return
-    a result dict, and this file just displays result["path"] step by step.
 """
 
 import tkinter as tk
@@ -24,7 +22,7 @@ class PuzzleApp:
         self.root = root
         root.title("8-Puzzle Solver")
 
-        # ---- The variables the screen shows ----
+        #  The variables the screen shows
         self.board = random_state()      # the puzzle to solve
         self.result = None               # result dict from the last solve
         self.step = 0                    # which state of result["path"] is shown
